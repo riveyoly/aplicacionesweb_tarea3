@@ -1,0 +1,48 @@
+@model Cliente
+
+<dl class="row mb-0">
+    <dt class="col-sm-4">Cédula / RUC</dt>
+    <dd class="col-sm-8">@Model.Cedula</dd>
+
+    <dt class="col-sm-4">Nombres</dt>
+    <dd class="col-sm-8">@Model.Nombres</dd>
+
+    <dt class="col-sm-4">Apellidos</dt>
+    <dd class="col-sm-8">@Model.Apellidos</dd>
+
+    <dt class="col-sm-4">Fecha de nacimiento</dt>
+    <dd class="col-sm-8">
+        @(Model.FechaNacimiento?.ToString("dd/MM/yyyy") ?? "-")
+        @if (Model.Edad is int edad)
+        {
+            <span class="text-muted">(@edad años)</span>
+        }
+    </dd>
+
+    <dt class="col-sm-4">Género</dt>
+    <dd class="col-sm-8">@Model.GeneroTexto</dd>
+
+    <dt class="col-sm-4">Correo electrónico</dt>
+    <dd class="col-sm-8">@(Model.Email ?? "-")</dd>
+
+    <dt class="col-sm-4">Teléfono</dt>
+    <dd class="col-sm-8">@(Model.Telefono ?? "-")</dd>
+
+    <dt class="col-sm-4">Celular</dt>
+    <dd class="col-sm-8">@(Model.Celular ?? "-")</dd>
+
+    <dt class="col-sm-4">Dirección</dt>
+    <dd class="col-sm-8">@(Model.Direccion ?? "-")</dd>
+
+    <dt class="col-sm-4">Ciudad / Provincia</dt>
+    <dd class="col-sm-8">@(Model.Ciudad ?? "-") / @(Model.Provincia ?? "-")</dd>
+
+    <dt class="col-sm-4">Límite de crédito</dt>
+    <dd class="col-sm-8">$ @Model.LimiteCredito.ToString("N2")</dd>
+
+    <dt class="col-sm-4">Estado</dt>
+    <dd class="col-sm-8">@(Model.Activo ? "Activo" : "Inactivo")</dd>
+
+    <dt class="col-sm-4">Fecha de registro</dt>
+    <dd class="col-sm-8">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</dd>
+</dl>

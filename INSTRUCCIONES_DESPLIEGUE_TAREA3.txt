@@ -1,0 +1,153 @@
+=====================================================================
+  INSTRUCCIONES DE DESPLIEGUE - CRUD DE CLIENTES EN C#
+  ASP.NET Core MVC + POO + PROCEDIMIENTOS ALMACENADOS (POSTGRESQL)
+  Aplicaciones Web - Semana 3 - Tarea 1
+=====================================================================
+
+ESTRUCTURA DEL PROYECTO (PATRON MVC)
+------------------------------------
+Tarea3/
+ |-- Program.cs                       Inicio de la aplicacion y rutas
+ |                                    (/Controlador/Accion/Id).
+ |-- appsettings.json                 Cadena de conexion a PostgreSQL.
+ |-- CrudClientes.csproj              Archivo del proyecto C#.
+ |-- Config/
+ |    `-- Database.cs                 Conexion a PostgreSQL (clase Database).
+ |-- Models/
+ |    |-- Cliente.cs                  MODELO: clase Cliente con 15 atributos,
+ |    |                               validaciones y los metodos del CRUD:
+ |    |                               Crear(), Listar(), BuscarPorId(),
+ |    |                               Actualizar() y Eliminar().
+ |    `-- CedulaEcuatorianaAttribute.cs  Valida la cedula ecuatoriana.
+ |-- Controllers/
+ |    |-- HomeController.cs           Pagina "Bienvenida YOLANDA".
+ |    |-- ClientesController.cs       CONTROLADOR del CRUD de clientes.
+ |    `-- ErrorController.cs
+ |-- Views/                           VISTAS (paginas .cshtml)
+ |    |-- Home/Index.cshtml           Bienvenida.
+ |    |-- Clientes/                   Index (lista), Create, Edit,
+ |    |                               Details, Delete y formularios.
+ |    `-- Shared/                     Plantilla general (_Layout).
+ |-- Database/                        Scripts SQL:
+ |    |-- 01_crear_tabla_clientes.sql     tabla clientes (15 campos)
+ |    |-- 02_procedimientos_clientes.sql  procedimientos del CRUD
+ |    `-- 03_datos_prueba.sql             3 clientes de ejemplo
+ `-- wwwroot/                         Estilos, Bootstrap y JavaScript.
+
+
+PROCEDIMIENTOS ALMACENADOS
+--------------------------
+   Crear       -> sp_clientes_insertar     (PROCEDURE)
+   Listar      -> sp_clientes_listar       (FUNCTION, con busqueda)
+   Ver uno     -> sp_clientes_obtener      (FUNCTION)
+   Actualizar  -> sp_clientes_actualizar   (PROCEDURE)
+   Eliminar    -> sp_clientes_eliminar     (PROCEDURE)
+
+Nota: en PostgreSQL un PROCEDURE no puede devolver filas; por eso las
+consultas (listar y obtener) se crearon como FUNCTION.
+
+
+REQUISITOS PREVIOS
+------------------
+1. SDK de .NET 8 (gratis en https://dotnet.microsoft.com/download).
+   Para comprobarlo, en una terminal escribir:  dotnet --list-sdks
+   Debe aparecer una version que empiece con 8.
+   (Si se usa Visual Studio 2022 version 17.8 o superior con
+   "Desarrollo de ASP.NET y web", el SDK ya viene incluido.)
+2. PostgreSQL instalado y en ejecucion, con pgAdmin. Se necesita la
+   contrasena del usuario "postgres".
+3. Internet la primera vez que se compila: .NET descarga
+   automaticamente el paquete Npgsql (conector de C# con PostgreSQL).
+
+No se necesita XAMPP ni Apache: ASP.NET Core trae su propio servidor.
+
+
+PASO 1 - CREAR LA BASE DE DATOS
+-------------------------------
+1. Abrir pgAdmin y conectarse al servidor.
+2. Clic derecho en "Databases" > Create > Database...
+   Nombre: crud_clientes   > Save.
+3. Seleccionar la base "crud_clientes" y abrir el Query Tool
+   (menu Tools > Query Tool).
+4. Abrir y ejecutar (F5), UNO POR UNO Y EN ESTE ORDEN, los archivos
+   de la carpeta Tarea3\Database:
+      01_crear_tabla_clientes.sql
+      02_procedimientos_clientes.sql
+      03_datos_prueba.sql   (opcional, agrega 3 clientes de ejemplo)
+
+
+PASO 2 - COPIAR EL PROYECTO
+---------------------------
+Descomprimir Tarea3_CRUD_Clientes_CSharp.zip en cualquier carpeta,
+por ejemplo:  C:\Proyectos\Tarea3
+
+
+PASO 3 - CONFIGURAR LA CONEXION
+-------------------------------
+Abrir el archivo Tarea3\appsettings.json con el Bloc de notas o
+Visual Studio Code y modificar la linea de la conexion:
+
+   "Clientes": "Host=localhost;Port=5432;Database=crud_clientes;Username=postgres;Password=TU_CONTRASEÑA"
+
+   - Reemplazar TU_CONTRASEÑA por la contrasena de postgres.
+   - Si PostgreSQL usa otro puerto (por ejemplo 5433), cambiar Port.
+
+Guardar el archivo.
+
+
+PASO 4 - EJECUTAR LA APLICACION
+-------------------------------
+OPCION A - Con la terminal:
+   cd C:\Proyectos\Tarea3
+   dotnet run
+
+   Esperar el mensaje:  Now listening on: http://localhost:5245
+   Para detener la aplicacion: Ctrl + C
+
+OPCION B - Con Visual Studio 2022:
+   Abrir el archivo CrudClientes.csproj y presionar F5.
+   El navegador se abre solo.
+
+
+PASO 5 - ABRIR LA APLICACION
+----------------------------
+En el navegador ingresar a:
+
+      http://localhost:5245
+
+Aparece la pagina "Bienvenida YOLANDA". Desde el menu "Clientes" se
+puede:
+   - Ver la lista de clientes y buscar por cedula, nombres o apellidos.
+   - Crear un cliente (boton "+ Nuevo cliente").
+   - Ver el detalle (boton "Ver").
+   - Editar un cliente (boton "Editar").
+   - Eliminar un cliente (boton "Eliminar", pide confirmacion).
+
+
+COMO FUNCIONA EL MVC EN ESTE PROYECTO
+-------------------------------------
+1. El usuario entra, por ejemplo, a /Clientes
+2. La ruta envia la peticion al metodo Index() de ClientesController.
+3. El controlador pide los datos al MODELO: Cliente.Listar().
+4. El modelo llama al procedimiento sp_clientes_listar en PostgreSQL
+   y devuelve una lista de objetos Cliente.
+5. El controlador entrega esa lista a la VISTA Views/Clientes/Index.cshtml,
+   que la muestra en una tabla.
+
+
+SOLUCION DE PROBLEMAS
+---------------------
+- "dotnet no se reconoce como un comando":
+     falta instalar el SDK de .NET 8, o cerrar y abrir la terminal
+     despues de instalarlo.
+- Error "NU1301" al compilar:
+     no hay internet para descargar Npgsql la primera vez.
+- Pagina "Ocurrio un error" al abrir Clientes:
+     revisar la contrasena y el puerto en appsettings.json, que
+     PostgreSQL este encendido y que los 3 scripts se hayan ejecutado
+     en la base crud_clientes.
+- "La cedula o RUC ingresado no es valido":
+     la cedula se verifica con el algoritmo ecuatoriano; usar una
+     cedula real o las de los datos de ejemplo.
+- "Ya existe un cliente con esta cedula":
+     la cedula ya esta registrada; usar otra o editar el cliente.
